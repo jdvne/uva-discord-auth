@@ -1,34 +1,38 @@
 '''
 TODO:   
         bot commands not working as intended
+        implement file logging
 '''
 
 import json, discord
+from datetime import datetime
 from discord.ext import commands
 
-class Course:
-    def __init__(self, name, guild_id, roster_path):
-        self.name = name,
-        self.guild_id = guild_id
-        self.roster_path = roster_path
-
-TOKEN = "ODAzMjU2NzIwNTQ5MzQ3MzU5.YA7JHQ.SVdy-sCFWZ350xupfYxDbNLsjPg"
-GUILD_ID = 877924693196308521
-ROSTER_PATH = "./cs3102roster.json"
-COHORT_PATH = "./cohorts.csv"
+CONFIG_PATH = "./config.json"
+TOKEN_PATH = "./TOKEN"
+ROSTER_PATH = "./rosters/"
 
 bot = commands.Bot(command_prefix="t!", intents=discord.Intents.all())
 
+def get_from_config(attr):
+    with open(CONFIG_PATH) as f:
+        return json.load(f)[attr]
+
+def main():
+    # begin event loop using token
+    with open(TOKEN_PATH) as TOKEN:
+        bot.run(TOKEN.read())
+
 @bot.event
 async def on_ready():
-    print("Turing is online!")
+    log("UVAuth is online!")
 
 @bot.event
 async def on_member_join(member):
     '''
     dm students for verification
     '''
-    print(f"{member} joined {member.guild.name}")
+    log(f"{member} joined {member.guild.name}")
     
     unverified = discord.utils.get(member.guild.roles, name="Unverified")
 
@@ -45,38 +49,43 @@ async def on_message(message):
     if not isinstance(message.channel, discord.channel.DMChannel) or user == bot.user:
         return
 
-    print(f"received a DM from {user}")
-    comp_id = message.content.lower()
+    log(f"received a DM from {user}")
+    computing_id = message.content.lower()
 
-    for member in bot.get_guild(GUILD_ID).members:
-        if member != user: continue
+    for course in get_from_config("courses"):
+        for guild in bot.guilds:
+            if guild.name == course["server_title"]:
+                break
 
-        with open(ROSTER_PATH) as f:
-            students = json.load(f)
+        for member in guild.members:
+            if member != user: continue
 
-        if comp_id not in students.keys():
-            print(f"{user} provided an invalid computing id")
-            await message.channel.send('Sorry, you either entered an invalid computing id, or you are currently not on the class roster! Please try again.')
-            # TODO: change this email
-            await message.channel.send('If your id was correct, you may need to be added to the class roster. In that case, please email njb2b@virginia.edu to request access.')
+            with open(ROSTER_PATH + course["roster_filename"]) as f:
+                students = json.load(f)
+
+            if computing_id not in students.keys():
+                log(f"{user} provided an invalid computing id")
+                await message.channel.send('Sorry, you either entered an invalid computing id, or you are currently not on the class roster! Please try again.')
+                await message.channel.send(f'If your id was correct, you may need to be added to the class roster. In that case, please email {course["support_email"]} to request access.')
+                continue
+
+            student = students[computing_id]
+
+            if "student" not in student["role"].lower():
+                log(f"{user} tried to access a non-Student role")
+                await message.channel.send(f"You provided the computing id of a staff member involved with {course['server_title']}.  If this is correct, please email {course['support_email']} to be verified manually.  Otherwise, please try again.")
+                continue
+
+            log(f"removing Unverified role and adding computing id {student['id']} to user {user}")
+            
+            nickname = student["name"] + ' (' + student["id"] + ')'
+            if len(nickname) > 32: nickname = student["name"].split()[0] + ' (' + student["id"] + ')'
+            if len(nickname) > 32: nickname = student["name"].split()[0][0] + '. (' + student["id"] + ')'
+            
+            await member.edit(nick=nickname, roles=[])
+            await message.channel.send(f'Welcome to {course["server_title"]}! You should now have access to all of the student channels in the course server. If you have any questions, send a message in "#💬general". Pay attention to "#📣announcements" for important course announcements.')
+            await message.channel.send('If you would like to specify your pronouns, please refer to #pronouns for more.')
             continue
-
-        student = students[comp_id]
-
-        if "student" not in student["role"].lower():
-            print(f"{user} tried to access a non-Student role")
-            # TODO: change this email
-            await message.channel.send("Sorry, you provided the computing id of a staff member involved with the course.  If this is correct, please email njb2b@virginia.edu to be verified manually.")
-            continue
-
-        print(f"removing Unverified role and adding computing id {student['id']} to user {user}")
-        nickname = student["name"] + ' (' + student["id"] + ')'
-        if len(nickname) > 32: nickname = student["name"].split()[0] + ' (' + student["id"] + ')'
-        if len(nickname) > 32: nickname = student["name"].split()[0][0] + '. (' + student["id"] + ')'
-        await member.edit(nick=nickname, roles=[])
-        await message.channel.send('Welcome to the class! You should now have access to all of the student channels in the course server. If you have any questions, send a message in "#💬general". Pay attention to "#📣announcements" for important course announcements.')
-        await message.channel.send('If you would like to specify your pronouns, please refer to #pronouns for more.')
-        continue
        
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -103,7 +112,7 @@ async def on_raw_reaction_add(payload):
             await message.remove_reaction(payload.emoji, member)
             return
         
-        print(f"gave the pronoun role associated with {reaction} to {member}")
+        log(f"gave the pronoun role associated with {reaction} to {member}")
 
 @bot.event
 async def on_raw_reaction_remove(payload):
@@ -124,19 +133,21 @@ async def on_raw_reaction_remove(payload):
         elif reaction == "💙": await member.remove_roles(discord.utils.get(guild_roles,name="just my name"))
         elif reaction == "💜": await member.remove_roles(discord.utils.get(guild_roles,name="please ask"))
 
-        print(f"removed the pronoun role associated with {reaction} to {member}")
+        log(f"removed the pronoun role associated with {reaction} to {member}")
 
 @bot.command()
 async def ping(ctx):
-    print(f"{ctx.author} sent a ping!")
+    log(f"{ctx.author} sent a ping!")
     await ctx.send("ping!")
 
 @bot.command()
 async def get_unverified(ctx):
-    print(f"{ctx.author} called get_unverified")
+    log(f"{ctx.author} called get_unverified")
 
-    with open(ROSTER_PATH) as f:
-        students = json.load(f)
+    for course in get_from_config("courses"):
+        if course["server_title"] == ctx.guild.name:
+            with open(ROSTER_PATH + course["roster_filename"]) as f:
+                students = json.load(f)
 
     staff = discord.utils.get(ctx.guild.roles, name="Staff")
     unverified = discord.utils.get(ctx.guild.roles, name="Unverified")
@@ -155,10 +166,21 @@ async def get_unverified(ctx):
 
     if unverified_ids:
         unverified_ids.sort()
-        print(f"here are the unverified students: {unverified_ids}")
+        log(f"here are the unverified students: {unverified_ids}")
         await ctx.send(f"here are the unverified students: {unverified_ids}")
     else:
-        print(f"all the students are verified!")
+        log(f"all the students are verified!")
         await ctx.send(f"all the students are verified!")
 
-bot.run(TOKEN)
+def log(message):
+    if get_from_config("logging")["console"]:
+        print(f'[{datetime.now()}] {message}')
+    
+    if get_from_config("logging")['file']:
+        #TODO implement
+        pass
+    
+    
+
+if __name__ == "__main__":
+    main()
