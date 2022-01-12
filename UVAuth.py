@@ -12,11 +12,19 @@ CONFIG_PATH = "./config.json"
 TOKEN_PATH = "./TOKEN"
 ROSTER_PATH = "./rosters/"
 
-bot = commands.Bot(command_prefix="t!", intents=discord.Intents.all())
+bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 
 def get_from_config(attr):
     with open(CONFIG_PATH) as f:
         return json.load(f)[attr]
+
+def log(message):
+    if get_from_config("logging")["console"]:
+        print(f'[{datetime.now()}] {message}')
+    
+    if get_from_config("logging")['file']:
+        #TODO implement
+        pass
 
 def main():
     # begin event loop using token
@@ -45,6 +53,8 @@ async def on_message(message):
     accept student dms for valid computing ids,
     remove unverified role upon correct id
     '''
+    await bot.process_commands(message)
+
     user = message.author
     if not isinstance(message.channel, discord.channel.DMChannel) or user == bot.user:
         return
@@ -86,7 +96,7 @@ async def on_message(message):
             await message.channel.send(f'Welcome to {course["server_title"]}! You should now have access to all of the student channels in the course server. If you have any questions, send a message in "#💬general". Pay attention to "#📣announcements" for important course announcements.')
             await message.channel.send('If you would like to specify your pronouns, please refer to #pronouns for more.')
             continue
-       
+
 @bot.event
 async def on_raw_reaction_add(payload):
     '''
@@ -136,11 +146,25 @@ async def on_raw_reaction_remove(payload):
         log(f"removed the pronoun role associated with {reaction} to {member}")
 
 @bot.command()
+@commands.has_role("Admin")
+async def say(ctx, arg):
+    await ctx.send(arg)
+
+@bot.command()
+@commands.has_role("Admin")
+async def react(ctx, message_id, *emojis):
+    message = await ctx.channel.fetch_message(message_id)
+    for emoji in emojis:
+        await message.add_reaction(emoji)
+
+@bot.command()
+@commands.has_role("Admin")
 async def ping(ctx):
     log(f"{ctx.author} sent a ping!")
     await ctx.send("ping!")
 
 @bot.command()
+@commands.has_any_role("Admin", "Professor", "Staff")
 async def get_unverified(ctx):
     log(f"{ctx.author} called get_unverified")
 
@@ -171,16 +195,6 @@ async def get_unverified(ctx):
     else:
         log(f"all the students are verified!")
         await ctx.send(f"all the students are verified!")
-
-def log(message):
-    if get_from_config("logging")["console"]:
-        print(f'[{datetime.now()}] {message}')
-    
-    if get_from_config("logging")['file']:
-        #TODO implement
-        pass
-    
-    
 
 if __name__ == "__main__":
     main()
