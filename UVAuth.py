@@ -1,16 +1,16 @@
 '''
 TODO:   
-        bot commands not working as intended
         implement file logging
 '''
 
-import json, discord
+import json
 from datetime import datetime
+
+import discord
 from discord.ext import commands
 
 CONFIG_PATH = "./config.json"
 TOKEN_PATH = "./TOKEN"
-ROSTER_PATH = "./rosters/"
 
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 
@@ -70,7 +70,7 @@ async def on_message(message):
         for member in guild.members:
             if member != user: continue
 
-            with open(ROSTER_PATH + course["roster_filename"]) as f:
+            with open(course["roster_path"]) as f:
                 students = json.load(f)
 
             if computing_id not in students.keys():
@@ -170,7 +170,7 @@ async def get_unverified(ctx):
 
     for course in get_from_config("courses"):
         if course["server_title"] == ctx.guild.name:
-            with open(ROSTER_PATH + course["roster_filename"]) as f:
+            with open(course["roster_path"]) as f:
                 students = json.load(f)
 
     staff = discord.utils.get(ctx.guild.roles, name="Staff")

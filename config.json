@@ -1,0 +1,29 @@
+{        
+    "logging" : {
+        "console" : true,
+        "file" : false
+    },
+
+    "courses" : [    
+        {
+            "server_title" : "CS 1112 (Spring 2022)",
+            "roster_path" : "./roster/cs1112.json",
+            "instructor" : "Elizabeth Orrico",
+            "support_email" : "jdd9kr@virginia.edu or emo7bf@virgina.edu"
+        },
+
+        {
+            "server_title" : "CS 2120 (Spring 2022)",
+            "roster_path" : "./roster/cs2120.json",
+            "instructor" : "Elizabeth Orrico and Briana Morrison",
+            "support_email" : "jdd9kr@virginia.edu or emo7bf@virginia.edu"
+        },
+
+        {
+            "server_title" : "CS 3102 (Spring 2022)",
+            "roster_path" : "./roster/cs3102.json",
+            "instructor" : "Nate Brunelle",
+            "support_email" : "jdd9kr@virginia.edu or njb2b@virginia.edu"
+        }
+    ]
+}
