@@ -1,6 +1,8 @@
 '''
 TODO:   
         implement file logging
+        add check for nonexistent roster files
+        add check for double-enrollment of students
 '''
 
 import json
@@ -25,11 +27,6 @@ def log(message):
     if get_from_config("logging")['file']:
         #TODO implement
         pass
-
-def main():
-    # begin event loop using token
-    with open(TOKEN_PATH) as TOKEN:
-        bot.run(TOKEN.read())
 
 @bot.event
 async def on_ready():
@@ -197,4 +194,6 @@ async def get_unverified(ctx):
         await ctx.send(f"all the students are verified!")
 
 if __name__ == "__main__":
-    main()
+    # begin event loop using token
+    with open(TOKEN_PATH) as TOKEN:
+        bot.run(TOKEN.read())
