@@ -7,7 +7,7 @@ setup(
     url='https://github.com/jdvne/uva-discord-auth',
     license='',
     author='jdvne',
-    author_email='TODO: @jdvne add your email here',
+    author_email='josh@devines.org',
     description='An authentication bot used across multiple UVA CS classes',
     install_requires=['discord.py', 'pytest']
 )
