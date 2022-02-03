@@ -1,6 +1,6 @@
 {            
     "CS 1112 (Spring 2022)" : {
-        "roster_path" : "./rosters/.json",
+        "roster_path" : "./rosters/1112.json",
         "instructor" : "Elizabeth Orrico",
         "support_email" : "jdd9kr@virginia.edu or emo7bf@virgina.edu"
     },

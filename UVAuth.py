@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+from datetime import datetime
 from os.path import exists
 import discord
 from discord.ext import commands
@@ -23,6 +24,10 @@ bot = commands.Bot(
     intents=discord.Intents.all())
 
 
+def log(message):
+    print(f'[{datetime.now()}] {message}')
+
+
 def load_course(guild_name):
     with open(COURSE_PATH) as f:
         courses = json.load(f)
@@ -36,12 +41,12 @@ def load_roster(course):
         with open(course["roster_path"]) as f:
             return json.load(f)
     else:
-        print(f'ERROR: roster file for {course} does not exist')
+        log(f'ERROR: roster file for {course} does not exist')
 
 
 @bot.event
 async def on_ready():
-    print("UVAuth is online!")
+    log("UVAuth is online!")
 
 
 @bot.event
@@ -49,7 +54,7 @@ async def on_member_join(member):
     '''
     dm students for verification
     '''
-    print(f"{member} joined {member.guild.name}")
+    log(f"{member} joined {member.guild.name}")
     
     unverified = discord.utils.get(member.guild.roles, name="Unverified")
 
@@ -74,7 +79,7 @@ async def on_message(message):
     if user == bot.user:
         return
 
-    print(f"received a DM from {user}")
+    log(f"received a DM from {user}")
 
     computing_id = message.content.lower()
 
@@ -90,7 +95,7 @@ async def on_message(message):
             continue
 
         if computing_id not in roster:
-            print(f"{user} provided an invalid computing id")
+            log(f"{user} provided an invalid computing id")
             await message.channel.send(
                 'Sorry, you either entered an invalid computing id, or you are '
                 f'not on the class roster for {guild.name}! Please '
@@ -104,7 +109,7 @@ async def on_message(message):
         student = roster[computing_id]
 
         if "student" not in student["role"].lower():
-            print(f"{user} tried to access a non-student role")
+            log(f"{user} tried to access a non-student role")
             await message.channel.send(
                 'You provided the computing id of a staff member involved with '
                 f'{guild.name}.  If this is correct, please email '
@@ -116,7 +121,7 @@ async def on_message(message):
             if member.nick is None: 
                 member.nick = member.name
             if computing_id in member.nick.lower():
-                print(f'{user} tried to enter the verified id {computing_id}')
+                log(f'{user} tried to enter the verified id {computing_id}')
                 await message.channel.send(
                     'Sorry, the computing id you entered has already been '
                     f'verified to a Discord user in {guild.name}.'
@@ -125,7 +130,7 @@ async def on_message(message):
                     'If you did not previously link this computing id or you '
                     'wish to switch which Discord user is verifed to your id, '
                     f'please email {course["support_email"]} for help.')
-        print(
+        log(
             f'removing Unverified role and adding computing id {computing_id} '
             f'to user {user}')
             
@@ -169,7 +174,7 @@ async def on_raw_reaction_add(payload):
         await message.remove_reaction(payload.emoji, member)
         return
     
-    print(f"gave the pronoun role associated with {reaction} to {member}")
+    log(f"gave the pronoun role associated with {reaction} to {member}")
 
 
 @bot.event
@@ -191,7 +196,7 @@ async def on_raw_reaction_remove(payload):
         pronoun_role = discord.utils.get(guild_roles,name=PRONOUNS[reaction])
         await member.remove_roles(pronoun_role)
 
-    print(f"removed the pronoun role associated with {reaction} to {member}")
+    log(f"removed the pronoun role associated with {reaction} to {member}")
 
 
 @bot.command()
@@ -203,7 +208,7 @@ async def say(ctx, arg):
 @bot.command()
 @commands.has_role("Admin")
 async def react(ctx, message_id, *emojis):
-    print()
+    log()
     message = await ctx.channel.fetch_message(message_id)
     for emoji in emojis:
         await message.add_reaction(emoji)
@@ -212,18 +217,18 @@ async def react(ctx, message_id, *emojis):
 @bot.command()
 @commands.has_role("Admin")
 async def ping(ctx):
-    print(f"{ctx.author} sent a ping!")
+    log(f"{ctx.author} sent a ping!")
     await ctx.send("pong!")
 
 
 @bot.command()
 @commands.has_role("Admin")
 async def get_unverified(ctx):
-    print(f"{ctx.author} called get_unverified")
+    log(f"{ctx.author} called get_unverified")
 
     course = load_course(ctx.guild.name)
     if course is None:
-        # TODO print that this course not registered in courses
+        # TODO log that this course not registered in courses
         return
 
     roster = load_roster(course)
@@ -248,13 +253,13 @@ async def get_unverified(ctx):
 
     if unverified_ids:
         unverified_ids.sort()
-        print(f"here are the unverified students: {unverified_ids}")
+        log(f"here are the unverified students: {unverified_ids}")
         await ctx.send(f"here are the unverified students: {unverified_ids}")
     else:
-        print(f"all the students are verified!")
+        log(f"all the students are verified!")
         await ctx.send(f"all the students are verified!")
 
-
+D
 if __name__ == "__main__":
     # begin event loop using token
     with open(TOKEN_PATH) as file:
