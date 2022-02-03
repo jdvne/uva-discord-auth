@@ -213,7 +213,7 @@ async def react(ctx, message_id, *emojis):
 @commands.has_role("Admin")
 async def ping(ctx):
     print(f"{ctx.author} sent a ping!")
-    await ctx.send("ping!")
+    await ctx.send("pong!")
 
 
 @bot.command()
