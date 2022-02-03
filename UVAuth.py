@@ -93,7 +93,7 @@ async def on_message(message):
             print(f"{user} provided an invalid computing id")
             await message.channel.send(
                 'Sorry, you either entered an invalid computing id, or you are '
-                f'not on the class roster for {course["server_title"]}! Please '
+                f'not on the class roster for {guild.name}! Please '
                 'try again.')
             await message.channel.send(
                 'If your id was correct, you may need to be added to the class '
@@ -107,7 +107,7 @@ async def on_message(message):
             print(f"{user} tried to access a non-student role")
             await message.channel.send(
                 'You provided the computing id of a staff member involved with '
-                f'{course["server_title"]}.  If this is correct, please email '
+                f'{guild.name}.  If this is correct, please email '
                 f'{course["support_email"]} to be verified manually.  '
                 'Otherwise, please try again.')
             continue
@@ -119,7 +119,7 @@ async def on_message(message):
                 print(f'{user} tried to enter the verified id {computing_id}')
                 await message.channel.send(
                     'Sorry, the computing id you entered has already been ',
-                    f'verified to a Discord user in {course["server_title"]}.'
+                    f'verified to a Discord user in {guild.name}.'
                 )
                 await message.channel.send(
                     'If you did not previously link this computing id or you '
@@ -137,7 +137,7 @@ async def on_message(message):
         
         await user_member.edit(nick=nickname, roles=[])
         await message.channel.send(
-            f'Welcome to {course["server_title"]}! You should now have access '
+            f'Welcome to {guild.name}! You should now have access '
             'to all of the student channels in the course server. If you have '
             'any questions, send a message in "#💬general". Pay attention to '
             '"#📣announcements" for important course announcements.')
