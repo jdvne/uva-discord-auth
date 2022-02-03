@@ -78,7 +78,7 @@ async def on_message(message):
 
     computing_id = message.content.lower()
 
-    for guild in bot.guilds:
+    for guild in bot.guilds:        
         course = load_course(guild.name)
         user_member = guild.get_member(user.id)
         if course is None or user_member is None:
@@ -118,7 +118,7 @@ async def on_message(message):
             if computing_id in member.nick.lower():
                 print(f'{user} tried to enter the verified id {computing_id}')
                 await message.channel.send(
-                    'Sorry, the computing id you entered has already been ',
+                    'Sorry, the computing id you entered has already been '
                     f'verified to a Discord user in {guild.name}.'
                 )
                 await message.channel.send(
@@ -127,7 +127,7 @@ async def on_message(message):
                     f'please email {course["support_email"]} for help.')
         print(
             f'removing Unverified role and adding computing id {computing_id} '
-            'to user {user}')
+            f'to user {user}')
             
         nickname = f'{student["name"]} ({computing_id})'
         if len(nickname) > 32: 

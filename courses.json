@@ -1,25 +1,25 @@
 {            
     "CS 1112 (Spring 2022)" : {
-        "roster_path" : "./roster/cs1112.json",
+        "roster_path" : "./rosters/.json",
         "instructor" : "Elizabeth Orrico",
         "support_email" : "jdd9kr@virginia.edu or emo7bf@virgina.edu"
     },
 
     "CS 2120 (Spring 2022)" : {
-        "roster_path" : "./roster/cs2120.json",
+        "roster_path" : "./rosters/cs2120_roster.json",
         "instructor" : "Elizabeth Orrico and Briana Morrison",
         "support_email" : "jdd9kr@virginia.edu or emo7bf@virginia.edu"
     },
 
     "CS 3102 (Spring 2022)" : {
-        "roster_path" : "./roster/cs3102.json",
+        "roster_path" : "./rosters/cs3102_roster.json",
         "instructor" : "Nate Brunelle",
         "support_email" : "jdd9kr@virginia.edu or njb2b@virginia.edu"
     },
 
     "CS 4102 Spring 2022" : {
-        "roster_path" : "",
+        "roster_path" : "./rosters/cs4102_s22.json",
         "instructor" : "Tom Horton and Robbie Hott",
-        "support_email" : "pba4bd@virginia.edu"
+        "support_email" : "horton@virginia.edu or pba4bd@virginia.edu"
     }
 }
