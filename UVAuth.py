@@ -20,14 +20,15 @@ PRONOUNS = {
 
 bot = commands.Bot(
     command_prefix="!", 
-    description="",
-    activity="DM me your computing id to be verified!",
     intents=discord.Intents.all())
 
 
 def load_course(guild_name):
     with open(COURSE_PATH) as f:
-        return json.load(f)[guild_name]
+        courses = json.load(f)
+        if guild_name not in courses:
+            return None
+        return courses[guild_name]
 
 
 def load_roster(course):
@@ -35,7 +36,7 @@ def load_roster(course):
         with open(course["roster_path"]) as f:
             return json.load(f)
     else:
-        print(f'ERROR: roster file for {course["course_name"]} does not exist')
+        print(f'ERROR: roster file for {course} does not exist')
 
 
 @bot.event
@@ -83,7 +84,7 @@ async def on_message(message):
         if course is None or user_member is None:
             continue
 
-        roster = load_roster()
+        roster = load_roster(course)
         if roster is None:
             # TODO tell student that roster not implemented
             continue
