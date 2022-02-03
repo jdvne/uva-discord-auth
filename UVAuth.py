@@ -137,7 +137,7 @@ async def on_message(message):
         await user_member.edit(nick=nickname, roles=[])
         await message.channel.send(
             f'Welcome to {course["server_title"]}! You should now have access '
-            'to all of the student channels in the course server. If you have ''
+            'to all of the student channels in the course server. If you have '
             'any questions, send a message in "#💬general". Pay attention to '
             '"#📣announcements" for important course announcements.')
         await message.channel.send(
