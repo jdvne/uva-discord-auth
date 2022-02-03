@@ -123,7 +123,7 @@ async def on_message(message):
                 await message.channel.send(
                     'If you did not previously link this computing id or you '
                     'wish to switch which Discord user is verifed to your id, '
-                    f'please email {course["support_email"]} for help.'
+                    f'please email {course["support_email"]} for help.')
         print(
             f'removing Unverified role and adding computing id {computing_id} '
             'to user {user}')
