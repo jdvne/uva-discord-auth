@@ -1,3 +1,7 @@
+## Quickstart
+
+1. run `pip install -e .` to set up dependencies
+
 ## Discord.py API Documentation
 https://discordpy.readthedocs.io/en/stable/api.html
 
