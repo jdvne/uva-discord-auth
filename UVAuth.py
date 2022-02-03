@@ -259,7 +259,7 @@ async def get_unverified(ctx):
         log(f"all the students are verified!")
         await ctx.send(f"all the students are verified!")
 
-D
+
 if __name__ == "__main__":
     # begin event loop using token
     with open(TOKEN_PATH) as file:
