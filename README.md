@@ -15,3 +15,4 @@ https://discord.com/api/oauth2/authorize?client_id=930862420484833351&permission
 - !OH command that TAs can use
     - will clear queue automatically
     - possibly linked to google calendar
+- self-assignable role for OH notifications
