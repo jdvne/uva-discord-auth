@@ -117,8 +117,12 @@ async def on_message(message):
                 'Otherwise, please try again.')
             continue
 
+        unverified = discord.utils.get(guild.roles, name="Unverified")
         id_repeated = False
+
         for member in guild.members:
+            if unverified in member.roles:
+                continue
             if member.nick is None: 
                 member.nick = member.name
             if computing_id in member.nick.lower():
