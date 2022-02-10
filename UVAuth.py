@@ -117,19 +117,26 @@ async def on_message(message):
                 'Otherwise, please try again.')
             continue
 
+        id_repeated = False
         for member in guild.members:
             if member.nick is None: 
                 member.nick = member.name
             if computing_id in member.nick.lower():
-                log(f'{user} tried to enter the verified id {computing_id}')
-                await message.channel.send(
-                    'Sorry, the computing id you entered has already been '
-                    f'verified to a Discord user in {guild.name}.'
-                )
-                await message.channel.send(
-                    'If you did not previously link this computing id or you '
-                    'wish to switch which Discord user is verifed to your id, '
-                    f'please email {course["support_email"]} for help.')
+                id_repeated = True
+                break
+
+        if id_repeated:
+            log(f'{user} tried to enter the verified id {computing_id}')
+            await message.channel.send(
+                'Sorry, the computing id you entered has already been '
+                f'verified to a Discord user in {guild.name}.'
+            )
+            await message.channel.send(
+                'If you did not previously link this computing id or you '
+                'wish to switch which Discord user is verifed to your id, '
+                f'please email {course["support_email"]} for help.')
+            continue
+            
         log(
             f'removing Unverified role and adding computing id {computing_id} '
             f'to user {user}')
