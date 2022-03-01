@@ -89,12 +89,19 @@ async def on_message(message):
         if course is None or user_member is None:
             continue
 
-        await message.channel.send(f'VERIFYING FOR {guild.name}...')
 
         roster = load_roster(course)
         if roster is None:
             # TODO tell student that roster not implemented
             continue
+
+        unverified = discord.utils.get(guild.roles, name="Unverified")
+        if unverified not in user_member.roles:
+            log(f"{user} already verified in {guild.name}")
+            await message.channel.send(f'Already verified in {guild.name}!')
+            continue
+
+        await message.channel.send(f'VERIFYING FOR {guild.name}...')
 
         if computing_id not in roster:
             log(f"{user} provided an invalid computing id")
@@ -119,7 +126,6 @@ async def on_message(message):
                 'Otherwise, please try again.')
             continue
 
-        unverified = discord.utils.get(guild.roles, name="Unverified")
         id_repeated = False
 
         for member in guild.members:
