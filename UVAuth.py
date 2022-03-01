@@ -83,11 +83,13 @@ async def on_message(message):
 
     computing_id = message.content.lower()
 
-    for guild in bot.guilds:        
+    for guild in bot.guilds:
         course = load_course(guild.name)
         user_member = guild.get_member(user.id)
         if course is None or user_member is None:
             continue
+
+        await message.channel.send(f'VERIFYING FOR {guild.name}...')
 
         roster = load_roster(course)
         if roster is None:
@@ -150,8 +152,10 @@ async def on_message(message):
             nickname = f'{student["name"].split()[0]} ({computing_id})'
         if len(nickname) > 32: 
             nickname = f'{student["name"].split()[0][0]} ({computing_id})'
-        
-        await user_member.edit(nick=nickname, roles=[])
+
+        await user_member.edit(nick=nickname)
+        await user_member.remove_roles(unverified)
+
         await message.channel.send(
             f'Welcome to {guild.name}! You should now have access '
             'to all of the student channels in the course server. If you have '
@@ -178,7 +182,7 @@ async def on_raw_reaction_add(payload):
     reaction = str(payload.emoji)
 
     if reaction in PRONOUNS:
-        pronoun_role = discord.utils.get(guild_roles,name=PRONOUNS[reaction])
+        pronoun_role = discord.utils.get(guild_roles, name=PRONOUNS[reaction])
         await member.add_roles(pronoun_role)
     else:
         message = await channel.fetch_message(payload.message_id)
